@@ -1,4 +1,3 @@
-from wsgiref.util import request_uri
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -80,7 +79,6 @@ def post_create(request):
         post.save()
         return redirect('posts:profile', request.user)
     return render(request, 'posts/post_create.html', {'form': form})
-    
 
 
 @login_required
@@ -136,7 +134,6 @@ def profile_follow(request, username):
     if author != request.user:
         Follow.objects.get_or_create(user = request.user, author=author)
     return redirect('posts:profile', username=username)
-
 
 @login_required
 def profile_unfollow(request, username):
