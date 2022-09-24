@@ -176,7 +176,6 @@ class PostPagesTests(TestCase):
         self.assertIsNotNone(is_edit)
         self.assertTrue(is_edit)
 
-
     def test_post_added_correctly_user2(self):
         # Пост добавляется кореектно
         group = PostPagesTests.author.get(
