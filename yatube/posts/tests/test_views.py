@@ -164,17 +164,18 @@ class PostPagesTests(TestCase):
         response = self.author.get(
             reverse('posts:post_edit', kwargs={'post_id': self.post.id})
         )
-        context = response.context
-        is_edit = context['is_edit']
         form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField,
         }
-        self.assertEqual(is_edit, True)
         for value, expected in form_fields.items():
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
+        is_edit = response.context.get('is_edit')
+        self.assertIsNotNone(is_edit)
+        self.assertTrue(is_edit)
+
 
     def test_post_added_correctly_user2(self):
         # Пост добавляется кореектно

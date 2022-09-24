@@ -1,3 +1,4 @@
+from wsgiref.util import request_uri
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -68,35 +69,41 @@ def post_detail(request, post_id):
 
 @login_required
 def post_create(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST or None,
-                        files=request.FILES or None
-                        )
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('posts:profile', request.user)
+    form = PostForm(request.POST or None,
+                    files=request.FILES or None
+                    )
+    if request.method != 'POST':
         return render(request, 'posts/post_create.html', {'form': form})
-    form = PostForm(request.POST or None)
+    if form.is_valid():
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        return redirect('posts:profile', request.user)
     return render(request, 'posts/post_create.html', {'form': form})
+    
 
 
 @login_required
 def post_edit(request, post_id):
-    is_edit = True
     post = get_object_or_404(Post, id=post_id)
-    if request.user == post.author:
-        form = PostForm(request.POST or None, instance=post,
-                        files=request.FILES or None)
+    if post.author != request.user:
+        return redirect('posts:post_detail', post_id=post.id)
+    if request.method == 'POST':
+        form = PostForm(request.POST or None,
+                        files=request.FILES or None,
+                        instance=post)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('posts:post_detail', post_id)
-        return render(request, 'posts/post_create.html', {'form': form,
-                                                          'is_edit': is_edit})
-    return redirect('posts:post_detail', post_id)
+            post = form.save()
+            return redirect('posts:post_detail', post_id=post.id)
+    form = PostForm(request.POST or None,
+                    files=request.FILES or None,
+                    instance=post)
+    context = {
+        'post': post,
+        'form': form,
+        'is_edit': True,
+    }
+    return render(request, 'posts/post_create.html', context)
 
 
 @login_required
@@ -113,7 +120,6 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
-    # информация о текущем пользователе доступна в переменной request.user
     post = Post.objects.filter(author__following__user=request.user)
     paginator = Paginator(post, POST_PER_PAGE)
     page_number = request.GET.get('page')
@@ -126,19 +132,14 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
-    # Подписаться на автора
     author = get_object_or_404(User, username=username)
-    author = author
-    user = request.user
     if author != request.user:
-        Follow.objects.get_or_create(user=user, author=author)
+        Follow.objects.get_or_create(user = request.user, author=author)
     return redirect('posts:profile', username=username)
 
 
 @login_required
 def profile_unfollow(request, username):
-    # Дизлайк, отписка
     author = get_object_or_404(User, username=username)
-    user = request.user
-    Follow.objects.filter(user=user, author=author).delete()
+    Follow.objects.filter(user = request.user, author=author).delete()
     return redirect("posts:profile", username=username)

@@ -3,11 +3,9 @@
 {% block title %}Подписки{% endblock %}
 
 {% block content %}
-{% include 'posts/includes/switcher.html' %}
+{% include 'includes/switcher.html' %}
 {% load thumbnail %}
   <h1>Подписки</h1>
-  {% load cache %}
-  {% cache 20 index_page %}
   {% for post in page_obj %}
     <article>
       <li>
@@ -33,6 +31,5 @@
     {% if not forloop.last %}
       <hr>{% endif %}
   {% endfor %}
-  {% endcache %}
   {% include 'includes/paginator.html' %}
 {% endblock %}
