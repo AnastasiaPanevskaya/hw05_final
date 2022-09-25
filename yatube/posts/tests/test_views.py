@@ -1,5 +1,4 @@
 import tempfile
-from venv import create
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
