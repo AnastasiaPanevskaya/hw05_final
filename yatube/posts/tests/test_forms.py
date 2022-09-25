@@ -26,6 +26,7 @@ class PostPagesTests(TestCase):
             slug='test-slug',
             description='Описание'
         )
+
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
@@ -34,7 +35,6 @@ class PostPagesTests(TestCase):
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-
 
     def test_post_create(self):
         small_gif = (

@@ -1,4 +1,3 @@
-from urllib import response
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
@@ -85,7 +84,7 @@ class PostURLTests(TestCase):
         page_noaut = {
             ('/create/'): (f'{login_url}?next=/create/'),
             (f'/posts/{self.post.id}/edit/'):
-                ( f'{login_url}?next=/posts/{self.post.id}/edit/'),
+                (f'{login_url}?next=/posts/{self.post.id}/edit/'),
             (f'/posts/{self.post.id}/comment/'):
                 (f'{login_url}?next=/posts/{self.post.id}/comment/'),
             (f'/profile/{self.user}/follow/'):

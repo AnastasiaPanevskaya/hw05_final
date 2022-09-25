@@ -80,6 +80,7 @@ def post_create(request):
     post.save()
     return redirect('posts:profile', request.user)
 
+
 @login_required
 def post_edit(request, post_id):
     post = get_object_or_404(Post, id=post_id)
