@@ -1,4 +1,5 @@
 import tempfile
+from venv import create
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
@@ -42,7 +43,7 @@ class PostPagesTests(TestCase):
             slug='group-slug02',
             description='Тестовое описание'
         )
-        small_gif = (
+        cls.small_gif = (
             b'\x47\x49\x46\x38\x39\x61\x02\x00'
             b'\x01\x00\x80\x00\x00\x00\x00\x00'
             b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
@@ -50,16 +51,17 @@ class PostPagesTests(TestCase):
             b'\x02\x00\x01\x00\x00\x02\x02\x0C'
             b'\x0A\x00\x3B'
         )
-        uploaded = SimpleUploadedFile(
+        cls.uploaded = SimpleUploadedFile(
             name='small.gif',
-            content=small_gif,
+            content=cls.small_gif,
             content_type='image/gif'
         )
+
         cls.post = Post.objects.create(
             text='Текст',
             author=cls.author_user,
             group=cls.group,
-            image=uploaded
+            image=cls.uploaded
         )
 
     def test_pages_uses_correct_template(self):
@@ -96,7 +98,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(object_01.text, self.post.text)
         self.assertEqual(object_01.group, self.post.group)
         self.assertEqual(object_01.author, self.author_user)
-        self.assertEqual(object_01.image, self.post.image)
+        self.assertEqual(object_01.image.read(), self.uploaded.open().read())
 
     def test_group_list_page_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
@@ -113,7 +115,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(object_01.text, self.post.text)
         self.assertEqual(object_01.group, self.post.group)
         self.assertEqual(object_01.author, self.author_user)
-        self.assertEqual(object_01.image, self.post.image)
+        self.assertEqual(object_01.image.read(), self.uploaded.open().read())
 
     def test_profile_page_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
@@ -131,7 +133,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(object_01.text, self.post.text)
         self.assertEqual(object_01.group, self.post.group)
         self.assertEqual(object_01.author, self.author_user)
-        self.assertEqual(object_01.image, self.post.image)
+        self.assertEqual(object_01.image.read(), self.uploaded.open().read())
 
     def test_post_detail_page_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом."""
@@ -142,7 +144,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(post.text, self.post.text)
         self.assertEqual(post.group, self.post.group)
         self.assertEqual(post.author, self.author_user)
-        self.assertEqual(post.image, self.post.image)
+        self.assertEqual(post.image.read(), self.uploaded.open().read())
 
     def test_post_create_page_show_correct_context(self):
         # Шаблон post_create, сформирован с правильным контекстом.
@@ -167,6 +169,7 @@ class PostPagesTests(TestCase):
         form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField,
+            'image': forms.ImageField
         }
         for value, expected in form_fields.items():
             with self.subTest(value=value):
@@ -185,7 +188,7 @@ class PostPagesTests(TestCase):
             )
         )
         page_obj = group.context['page_obj']
-        self.assertNotIn(self.post, page_obj, None)
+        self.assertNotIn(self.post, page_obj)
 
     def test_cache_index(self):
         post_c = Post.objects.create(
@@ -273,9 +276,10 @@ class FollowerClientTest(TestCase):
             user=self.authorized_user).exists())
 
     def test_autorized_unsubscription(self):
-        self.authorized_client.post(
-            reverse('posts:profile_follow', kwargs={
-                    'username': self.author_user}))
+        Follow.objects.create(
+            author=self.author_user,
+            user=self.authorized_user
+        )
         follow_count01 = Follow.objects.count()
         self.authorized_client.post(
             reverse('posts:profile_unfollow', kwargs={

@@ -1,3 +1,4 @@
+from urllib import response
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
@@ -42,7 +43,7 @@ class PostURLTests(TestCase):
         }
         for address, template in all_templates.items():
             with self.subTest(address=address):
-                response = self.author_post.get(address)
+                response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
 
         authorized_templates = {
@@ -51,7 +52,7 @@ class PostURLTests(TestCase):
         # Авторизованный клиент
         for address, template in authorized_templates.items():
             with self.subTest(address=address):
-                response = self.author_post.get(address)
+                response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
 
         edit_templates = {
@@ -81,15 +82,21 @@ class PostURLTests(TestCase):
         """ Проверяет редирект неавторизованного клиента ,
         старница создания поста и ред.поста"""
         login_url = reverse('users:login')
-        self.assertRedirects(self.guest_client.get('/create/'),
-                             f'{login_url}?next=/create/')
-        self.assertRedirects(self.guest_client.get(
-                             f'/posts/{self.post.id}/edit/'),
-                             f'{login_url}?next=/posts/{self.post.id}/edit/')
-        self.assertRedirects(self.guest_client.get(
-                             f'/posts/{self.post.id}/comment/'),
-                             f'{login_url}?next=/posts/{self.post.id}/comment/'
-                             )
+        page_noaut = {
+            ('/create/'): (f'{login_url}?next=/create/'),
+            (f'/posts/{self.post.id}/edit/'):
+                ( f'{login_url}?next=/posts/{self.post.id}/edit/'),
+            (f'/posts/{self.post.id}/comment/'):
+                (f'{login_url}?next=/posts/{self.post.id}/comment/'),
+            (f'/profile/{self.user}/follow/'):
+                (f'{login_url}?next=/profile/{self.user}/follow/'),
+            (f'/profile/{self.user}/unfollow/'):
+                (f'{login_url}?next=/profile/{self.user}/unfollow/')
+        }
+        for page, page_address in page_noaut.items():
+            with self.subTest(page_address=page_address):
+                response = self.guest_client.get(page, follow=True)
+                self.assertRedirects(response, page_address)
 
     def test_post_edit_redirect(self):
         """ Проверяет редирект авторизованного клиента ,
@@ -103,5 +110,5 @@ class PostURLTests(TestCase):
 class ViewTestClass(TestCase):
     def test_error_page(self):
         response = self.client.get('/nonexist-page/')
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND, 404)
         self.assertTemplateUsed(response, "core/404.html")
