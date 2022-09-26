@@ -1,9 +1,10 @@
 import tempfile
+import shutil
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django import forms
 from django.core.cache import cache
@@ -21,6 +22,7 @@ NUMBER_GROUP_TEST = 0
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostPagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -62,6 +64,10 @@ class PostPagesTests(TestCase):
             group=cls.group,
             image=cls.uploaded
         )
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
     def test_pages_uses_correct_template(self):
         # проверка шаблонов
@@ -145,24 +151,10 @@ class PostPagesTests(TestCase):
         self.assertEqual(post.author, self.author_user)
         self.assertEqual(post.image.read(), self.uploaded.open().read())
 
-    def test_post_create_page_show_correct_context(self):
-        # Шаблон post_create, сформирован с правильным контекстом.
-        response = self.author.get(reverse('posts:post_create'))
-        form_fields = {
-            'text': forms.fields.CharField,
-            'group': forms.fields.ChoiceField,
-            'image': forms.ImageField
-        }
-        for value, expected in form_fields.items():
-            with self.subTest(value=value):
-                form_field = response.context.get('form').fields.get(value)
-                self.assertIsInstance(form_field, expected)
-# Я запуталсь пока делала всё в одном тесте, поэтому разделила их
-# Я могу их соеденить потом , но пока у меня возникали ошибки
-
-    def test_post_edit(self):
-        # Шаблон post_edit, сформирован с правильным контекстом.
-        response = self.author.get(
+    def test_post_create_edit_page_show_correct_context(self):
+        # Шаблон post_create и post_edit, сформирован с правильным контекстом.
+        address_page = (
+            reverse('posts:post_create'),
             reverse('posts:post_edit', kwargs={'post_id': self.post.id})
         )
         form_fields = {
@@ -170,10 +162,13 @@ class PostPagesTests(TestCase):
             'group': forms.fields.ChoiceField,
             'image': forms.ImageField
         }
-        for value, expected in form_fields.items():
-            with self.subTest(value=value):
-                form_field = response.context.get('form').fields.get(value)
-                self.assertIsInstance(form_field, expected)
+        for page in address_page:
+            response = self.author.get(page)
+            for value, expected in form_fields.items():
+                with self.subTest(value=value):
+                    form_field = response.context.get('form').fields.get(value)
+                    self.assertIsInstance(form_field, expected)
+        response = self.author.get(reverse('posts:post_edit', kwargs={'post_id': self.post.id}))
         is_edit = response.context.get('is_edit')
         self.assertIsNotNone(is_edit)
         self.assertTrue(is_edit)

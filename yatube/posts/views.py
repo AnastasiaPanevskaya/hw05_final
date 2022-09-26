@@ -71,9 +71,7 @@ def post_create(request):
     form = PostForm(request.POST or None,
                     files=request.FILES or None
                     )
-    if request.method != 'POST':
-        return render(request, 'posts/post_create.html', {'form': form})
-    if not form.is_valid():
+    if request.method != 'POST' or not form.is_valid():
         return render(request, 'posts/post_create.html', {'form': form})
     post = form.save(commit=False)
     post.author = request.user
@@ -93,9 +91,7 @@ def post_edit(request, post_id):
         'form': form,
         'is_edit': True,
     }
-    if request.method != 'POST':
-        return render(request, 'posts/post_create.html', context)
-    if not form.is_valid():
+    if request.method != 'POST' or not form.is_valid():
         return render(request, 'posts/post_create.html', context)
     form.save()
     return redirect('posts:post_detail', post_id=post.id)

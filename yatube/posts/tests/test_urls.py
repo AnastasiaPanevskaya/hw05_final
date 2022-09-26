@@ -36,28 +36,14 @@ class PostURLTests(TestCase):
         # Правилные шаблоны
         all_templates = {
             '/': 'posts/index.html',
+            '/create/': 'posts/post_create.html',
+            '/follow/': 'posts/follow.html',
             f'/group/{PostURLTests.group.slug}/': 'posts/group_list.html',
             f'/profile/{PostURLTests.user.username}/': 'posts/profile.html',
-            f'/posts/{PostURLTests.post.id}/': 'posts/post_detail.html'
-        }
-        for address, template in all_templates.items():
-            with self.subTest(address=address):
-                response = self.authorized_client.get(address)
-                self.assertTemplateUsed(response, template)
-
-        authorized_templates = {
-            '/create/': 'posts/post_create.html'
-        }
-        # Авторизованный клиент
-        for address, template in authorized_templates.items():
-            with self.subTest(address=address):
-                response = self.authorized_client.get(address)
-                self.assertTemplateUsed(response, template)
-
-        edit_templates = {
+            f'/posts/{PostURLTests.post.id}/': 'posts/post_detail.html',
             f'/posts/{PostURLTests.post.id}/edit/': 'posts/post_create.html'
         }
-        for address, template in edit_templates.items():
+        for address, template in all_templates.items():
             with self.subTest(address=address):
                 response = self.author_post.get(address)
                 self.assertTemplateUsed(response, template)
@@ -109,5 +95,5 @@ class PostURLTests(TestCase):
 class ViewTestClass(TestCase):
     def test_error_page(self):
         response = self.client.get('/nonexist-page/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND, 404)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.assertTemplateUsed(response, "core/404.html")
