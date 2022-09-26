@@ -64,6 +64,7 @@ class PostPagesTests(TestCase):
             group=cls.group,
             image=cls.uploaded
         )
+
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
@@ -168,7 +169,8 @@ class PostPagesTests(TestCase):
                 with self.subTest(value=value):
                     form_field = response.context.get('form').fields.get(value)
                     self.assertIsInstance(form_field, expected)
-        response = self.author.get(reverse('posts:post_edit', kwargs={'post_id': self.post.id}))
+        response = self.author.get(reverse('posts:post_edit',
+            kwargs={'post_id': self.post.id}))
         is_edit = response.context.get('is_edit')
         self.assertIsNotNone(is_edit)
         self.assertTrue(is_edit)
