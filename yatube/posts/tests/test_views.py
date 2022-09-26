@@ -170,7 +170,7 @@ class PostPagesTests(TestCase):
                     form_field = response.context.get('form').fields.get(value)
                     self.assertIsInstance(form_field, expected)
         response = self.author.get(reverse('posts:post_edit',
-            kwargs={'post_id': self.post.id}))
+                                   kwargs={'post_id': self.post.id}))
         is_edit = response.context.get('is_edit')
         self.assertIsNotNone(is_edit)
         self.assertTrue(is_edit)
