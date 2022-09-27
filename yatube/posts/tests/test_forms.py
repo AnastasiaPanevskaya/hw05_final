@@ -49,38 +49,38 @@ class PostPagesTests(TestCase):
         super().tearDownClass()
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
-    def test_post_create(self): 
-        small_gif = ( 
-            b'\x47\x49\x46\x38\x39\x61\x02\x00' 
-            b'\x01\x00\x80\x00\x00\x00\x00\x00' 
-            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00' 
-            b'\x00\x00\x00\x2C\x00\x00\x00\x00' 
-            b'\x02\x00\x01\x00\x00\x02\x02\x0C' 
-            b'\x0A\x00\x3B' 
+    def test_post_create(self):
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
         )
-        uploaded = SimpleUploadedFile( 
-            name='small.gif', 
-            content=small_gif, 
-            content_type='image/gif' 
+        uploaded = SimpleUploadedFile(
+            name='small.gif',
+            content=small_gif,
+            content_type='image/gif'
         )
-        form_data = { 
-            'text': 'Текст записанный в форму', 
-            'group': self.group.id, 
-            'image': self.uploaded, 
-        } 
-        posts_count = Post.objects.count() 
-        response = self.authorized_client.post( 
-            reverse('posts:post_create'), 
-            data=form_data, 
-            follow=True 
+        form_data = {
+            'text': 'Текст записанный в форму',
+            'group': self.group.id,
+            'image': self.uploaded,
+        }
+        posts_count = Post.objects.count()
+        response = self.authorized_client.post(
+            reverse('posts:post_create'),
+            data=form_data,
+            follow=True
         )
-        self.assertEqual(response.status_code, HTTPStatus.OK) 
-        created_post = Post.objects.last() 
-        self.assertEqual(Post.objects.count(), 
-                         posts_count + 1, 
-                         ) 
-        self.assertEqual(created_post.id, form_data['group']) 
-        self.assertEqual(created_post.text, form_data['text']) 
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        created_post = Post.objects.last()
+        self.assertEqual(Post.objects.count(),
+                         posts_count + 1,
+                         )
+        self.assertEqual(created_post.id, form_data['group'])
+        self.assertEqual(created_post.text, form_data['text'])
         self.assertEqual(created_post.author, self.user) 
         self.assertEqual(created_post.image.read(), uploaded.open().read())
 
