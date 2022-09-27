@@ -92,7 +92,7 @@ class PostPagesTests(TestCase):
                                    author=self.user,
                                    group=self.group,
                                    image=self.uploaded
-                                  )
+                                   )
         form_data = {
             'text': 'Текст записанный в форму',
             'group': self.group.id,
