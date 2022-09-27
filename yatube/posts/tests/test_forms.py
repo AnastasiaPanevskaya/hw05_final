@@ -81,7 +81,7 @@ class PostPagesTests(TestCase):
                          )
         self.assertEqual(created_post.id, form_data['group'])
         self.assertEqual(created_post.text, form_data['text'])
-        self.assertEqual(created_post.author, self.user) 
+        self.assertEqual(created_post.author, self.user)
         self.assertEqual(created_post.image.read(), uploaded.open().read())
 
     def test_post_edit(self):
@@ -89,10 +89,10 @@ class PostPagesTests(TestCase):
                                           slug='test-group',
                                           description='Описание')
         post = Post.objects.create(text='Тестовый текст',
-                                    author=self.user,
-                                    group=self.group,
-                                    image=self.uploaded
-                                   )
+                                   author=self.user,
+                                   group=self.group,
+                                   image=self.uploaded
+                                  )
         form_data = {
             'text': 'Текст записанный в форму',
             'group': self.group.id,
