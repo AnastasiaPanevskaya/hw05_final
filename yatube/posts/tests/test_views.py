@@ -13,13 +13,13 @@ from posts.models import Post, Group, Follow
 
 
 User = get_user_model()
+TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 NUMBER_OF_POST_TEST = 3
 FIRST_PAGE_POST = 10
 NUM_P_ALL = 13
 NUMBER_GROUP = 1
 NUMBER_GROUP_TEST = 0
-TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
