@@ -4,7 +4,7 @@
 
 ## Клонируем репозиторий и заходим в него через терминал
 git clone git@github.com:AnastasiaPanevskaya/hw05_final.git
-cd hw05_final
+___cd hw05_final
 
 ## Создать и запуспустить виртуальное окружение
 python -m venv venv
