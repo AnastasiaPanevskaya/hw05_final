@@ -1,3 +1,26 @@
-# hw05_final
+# Yatube - Это социальная сеть и сеть микроблогов, в которой пользователи публикуют сообщения. Личные дневники и сообщества.
 
-[![CI](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml)
+Как запустить проект:
+
+## Клонируем репозиторий и заходим в него через терминал
+git clone git@github.com:AnastasiaPanevskaya/hw05_final.git
+cd hw05_final
+
+## Создать и запуспустить виртуальное окружение
+python -m venv venv
+source venv/Scripts/activate
+
+## Установить зависимости 
+pip install -r requirements.txt
+
+## Выполните миграции
+python manage.py migrate
+
+## Запустить сервер 
+
+python manage.py runserver
+
+## Адрес главной страницы сообщества:
+http://127.0.0.1:8000/
+
+
