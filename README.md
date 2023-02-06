@@ -2,21 +2,23 @@
 
 Как запустить проект:
 
-## Клонируем репозиторий и заходим в него через терминал
+## Клонируем репозиторий:
 git clone git@github.com:AnastasiaPanevskaya/hw05_final.git
-___cd hw05_final
 
-## Создать и запуспустить виртуальное окружение
+## Заходим в директорию проекта:
+cd hw05_final
+
+## Создать и запуспустить виртуальное окружение:
 python -m venv venv
 source venv/Scripts/activate
 
-## Установить зависимости 
+## Установить зависимости:
 pip install -r requirements.txt
 
-## Выполните миграции
+## Выполните миграции:
 python manage.py migrate
 
-## Запустить сервер 
+## Запустить сервер:
 
 python manage.py runserver
 
