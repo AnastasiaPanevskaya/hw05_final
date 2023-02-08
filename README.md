@@ -8,7 +8,7 @@ git clone git@github.com:AnastasiaPanevskaya/hw05_final.git
 ### Заходим в директорию проекта:
 cd hw05_final
 
-### Создать и запуспустить виртуальное окружение:
+### Создать и запустить виртуальное окружение:
 python -m venv venv  
 source venv/Scripts/activate
 
